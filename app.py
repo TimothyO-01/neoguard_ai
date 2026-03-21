@@ -16,7 +16,7 @@ from utils.alerts import generate_alerts, plot_national_risk
 # Load model and features
 # -----------------------
 model = joblib.load("model/neoguard_model.pkl")
-features = joblib.load("model/features.pkl")
+features = joblib.load("model/neoguard_features.pkl")
 
 # -----------------------
 # App Configuration
