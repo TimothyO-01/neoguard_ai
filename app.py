@@ -32,7 +32,7 @@ st.set_page_config(
 # -----------------------
 
 st.image(
-    "assets/logos/neoguard_logo.png",
+    "assets/logos/logos.png",
     width=150
 )
 
