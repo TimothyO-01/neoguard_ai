@@ -10,7 +10,9 @@ def preprocess_input(df):
     for col in df.select_dtypes(include=["object"]):
         df[col] = pd.factorize(df[col])[0]
 
-    return dfimport pandas as pd
+    return df
+    import pandas as pd
+    
 import numpy as np
 
 def preprocess_input(df):
