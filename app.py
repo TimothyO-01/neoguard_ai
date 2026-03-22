@@ -4,6 +4,7 @@ import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
 import shap
+pip install plotly
 import plotly.express as px
 
 # Import utility functions
