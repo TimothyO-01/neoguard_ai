@@ -12,6 +12,7 @@ from utils.prediction import predict_risk
 from utils.shap_explain import shap_summary_plot, shap_single_plot
 from utils.alerts import generate_alerts, plot_national_risk
 
+
 # -----------------------
 # Load model and features
 # -----------------------
