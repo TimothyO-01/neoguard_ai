@@ -33,7 +33,7 @@ st.set_page_config(
 # -----------------------
 
 st.image(
-    "asset/logos/logos.png",
+    "asset/logos.png",
     width=150
 )
 
