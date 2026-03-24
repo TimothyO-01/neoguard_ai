@@ -76,9 +76,13 @@ if input_mode == "Manual Entry":
                     input_df[col] = 0
 
             input_df = input_df[features]
+            st.subheader("Readable Input")
+            st.write(user_input)
+            st.subheader("Processed Input (Model Format)")
+            st.write(input_df)
 
             # DEBUG 
-            st.write("Processed Input:", input_df)
+            
             st.write("Prediction Probability:", model.predict_proba(input_df))
 
             # Prediction
@@ -91,6 +95,8 @@ if input_mode == "Manual Entry":
 
         except Exception as e:
             st.error(f"Error during prediction: {e}")
+
+
 
 # =======================
 # CSV UPLOAD
