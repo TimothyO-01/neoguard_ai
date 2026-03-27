@@ -73,11 +73,11 @@ st.sidebar.download_button(
 # -----------------------
 def clinical_advice(prob):
     if prob >= 0.7:
-        return "HIGH RISK:\nImmediate referral\nContinuous monitoring\nPrepare neonatal care"
+        return "HIGH RISK:\n Immediate referral\n Continuous monitoring\n Prepare neonatal care"
     elif prob >= 0.4:
-        return "MODERATE RISK:\nMonitor closely\nIncrease Antenatal Care visits\nFacility delivery advised"
+        return "MODERATE RISK:\n Monitor closely\n Increase Antenatal Care visits\n Facility delivery advised"
     else:
-        return "LOW RISK:\nRoutine care\nContinue Antenatal Care visits"
+        return "LOW RISK:\n Routine care\n Continue Antenatal Care visits"
 
 def explain_risk(data):
     reasons = []
