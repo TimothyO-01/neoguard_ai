@@ -166,7 +166,7 @@ if input_mode == "Manual Entry":
             bord = st.text_input("Birth Order")
 
         with col2:
-            b11 = st.text_input("Birth Interval")
+            b11 = st.text_input("Birth Interval (months)")
             m15 = st.selectbox("Delivery Place", ["Home","PHC","Hospital/Clinic"])
             m14 = st.text_input("Antenatal Care Visits")
             m1 = st.selectbox("Tetanus Protection", ["Yes","No"])
