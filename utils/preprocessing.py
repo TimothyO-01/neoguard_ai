@@ -5,7 +5,36 @@ def preprocess_input(df):
     df = df.copy()
 
     # -----------------------
-    # Numeric conversion
+    # COLUMN STANDARDIZATION (NEW)
+    # -----------------------
+    rename_map = {
+        "Age": "v012",
+        "Education": "v149",
+        "Residence": "v140",
+        "Wealth": "v190",
+        "Sex": "b4",
+        "BirthOrder": "bord",
+        "BirthInterval": "b11",
+        "DeliveryPlace": "m15",
+        "ANC": "m14",
+        "Tetanus": "m1",
+        "MultipleBirth": "b0",
+        "BirthWeight": "m19"
+    }
+
+    df.rename(columns=rename_map, inplace=True)
+
+    # -----------------------
+    # ENSURE ALL REQUIRED COLUMNS EXIST
+    # -----------------------
+    required_cols = ["v012","v149","v140","v190","b4","bord","b11","m15","m14","m1","b0","m19"]
+
+    for col in required_cols:
+        if col not in df.columns:
+            df[col] = np.nan
+
+    # -----------------------
+    # NUMERIC CONVERSION
     # -----------------------
     numeric_cols = ["v012", "bord", "b11", "m14", "m19"]
 
@@ -15,12 +44,24 @@ def preprocess_input(df):
     df[numeric_cols] = df[numeric_cols].fillna(0)
 
     # -----------------------
-    # Encoding with fallback
+    # ENCODING
     # -----------------------
     df["b4"] = df["b4"].map({"Male":1, "Female":0}).fillna(0)
-    df["v140"] = df["v140"].map({"Urban":1, "Rural":0}).fillna(0)
-    df["m1"] = df["m1"].map({"Yes":1, "No":0}).fillna(0)
-    df["b0"] = df["b0"].map({"Yes":1, "No":0}).fillna(0)
+
+    df["v140"] = df["v140"].map({
+        "Urban":1,
+        "Rural":0
+    }).fillna(0)
+
+    df["m1"] = df["m1"].map({
+        "Yes":1,
+        "No":0
+    }).fillna(0)
+
+    df["b0"] = df["b0"].map({
+        "Yes":1,
+        "No":0
+    }).fillna(0)
 
     df["m15"] = df["m15"].map({
         "Home":0,
