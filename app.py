@@ -305,24 +305,14 @@ elif input_mode == "Batch Analysis (CSV)":
             lambda x: "High Risk" if x >= 0.7 else ("Moderate Risk" if x >= 0.4 else "Low Risk")
         )
 
-        st.subheader("Patient-Friendly Results")
+        st.subheader("Patient Results")
         st.dataframe(raw_df)
 
         st.subheader("High Risk Cases")
         st.dataframe(raw_df[raw_df["risk_class"] == "High Risk"])
 
         result_csv = raw_df.to_csv(index=False)
-
-
-        if page == "Population Dashboard":
-            st.bar_chart(raw_df["risk_class"].value_counts())
-
-        elif page == "Early Warning Alerts":
-            st.warning(generate_alerts(raw_df))
-
-    else:
-        st.info("Upload a CSV file to continue.")
-
+        
 # -----------------------
         # PDF DOWNLOAD 
         # -----------------------
@@ -334,4 +324,15 @@ elif input_mode == "Batch Analysis (CSV)":
             "neoguard_batch_report.pdf",
             "application/pdf"
         )
+
         
+
+        if page == "Population Dashboard":
+            st.bar_chart(raw_df["risk_class"].value_counts())
+
+        elif page == "Early Warning Alerts":
+            st.warning(generate_alerts(raw_df))
+
+    else:
+        st.info("Upload a CSV file to continue.")
+
