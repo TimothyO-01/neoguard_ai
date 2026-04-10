@@ -45,6 +45,7 @@ input_mode = st.sidebar.radio(
 # TEMPLATE DOWNLOAD
 # -----------------------
 sample_df = pd.DataFrame({
+    "S/N":[1],
     "Age":[25],
     "Education":["No education"],
     "Residence":["Rural"],
@@ -180,17 +181,6 @@ def generate_batch_pdf(df):
 
 elif input_mode == "Batch Analysis (CSV)":
 
-# -----------------------
-        # PDF DOWNLOAD (NEW)
-        # -----------------------
-        pdf_batch = generate_batch_pdf(raw_df)
-
-        st.download_button(
-            "Download Batch Clinical Report (PDF)",
-            pdf_batch,
-            "neoguard_batch_report.pdf",
-            "application/pdf"
-    )
 
 # ============================
 # MANUAL ENTRY 
@@ -332,3 +322,16 @@ elif input_mode == "Batch Analysis (CSV)":
 
     else:
         st.info("Upload a CSV file to continue.")
+
+# -----------------------
+        # PDF DOWNLOAD 
+        # -----------------------
+        pdf_batch = generate_batch_pdf(raw_df)
+
+        st.download_button(
+            "Download Batch Clinical Report (PDF)",
+            pdf_batch,
+            "neoguard_batch_report.pdf",
+            "application/pdf"
+        )
+        
