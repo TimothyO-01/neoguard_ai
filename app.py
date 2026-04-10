@@ -47,7 +47,6 @@ input_mode = st.sidebar.radio(
 # TEMPLATE
 # -----------------------
 sample_df = pd.DataFrame({
-    "S/N":[1],
     "Age":[25],
     "Education":["No education"],
     "Residence":["Rural"],
