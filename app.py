@@ -136,8 +136,64 @@ def generate_pdf(result, prob, advice, factors):
     with open("report.pdf", "rb") as f:
         return f.read()
 
+def generate_batch_pdf(df):
+    doc = SimpleDocTemplate("batch_report.pdf")
+    styles = getSampleStyleSheet()
+    story = []
+
+    story.append(Paragraph("NeoGuard AI Batch Clinical Report", styles["Title"]))
+    story.append(Spacer(1, 12))
+
+    # Summary
+    total = len(df)
+    high = len(df[df["risk_class"] == "High Risk"])
+    moderate = len(df[df["risk_class"] == "Moderate Risk"])
+    low = len(df[df["risk_class"] == "Low Risk"])
+
+    story.append(Paragraph(f"Total Patients: {total}", styles["Normal"]))
+    story.append(Paragraph(f"High Risk: {high}", styles["Normal"]))
+    story.append(Paragraph(f"Moderate Risk: {moderate}", styles["Normal"]))
+    story.append(Paragraph(f"Low Risk: {low}", styles["Normal"]))
+    story.append(Spacer(1, 12))
+
+    # Table (limit rows to avoid oversized PDF)
+    display_df = df.copy().head(20)
+
+    table_data = [list(display_df.columns)] + display_df.values.tolist()
+
+    table = Table(table_data)
+
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+        ("FONTSIZE", (0, 0), (-1, -1), 8)
+    ]))
+
+    story.append(Paragraph("Sample Patient Results (Top 20)", styles["Heading2"]))
+    story.append(table)
+
+    doc.build(story)
+
+    with open("batch_report.pdf", "rb") as f:
+        return f.read()
+
+elif input_mode == "Batch Analysis (CSV)":
+
+# -----------------------
+        # PDF DOWNLOAD (NEW)
+        # -----------------------
+        pdf_batch = generate_batch_pdf(raw_df)
+
+        st.download_button(
+            "Download Batch Clinical Report (PDF)",
+            pdf_batch,
+            "neoguard_batch_report.pdf",
+            "application/pdf"
+    )
+
 # ============================
-# MANUAL ENTRY (UNCHANGED)
+# MANUAL ENTRY 
 # ============================
 if input_mode == "Manual Entry":
 
@@ -267,12 +323,6 @@ elif input_mode == "Batch Analysis (CSV)":
 
         result_csv = raw_df.to_csv(index=False)
 
-        st.download_button(
-            "Download Patient Results (CSV)",
-            result_csv,
-            "neoguard_results.csv",
-            "text/csv"
-        )
 
         if page == "Population Dashboard":
             st.bar_chart(raw_df["risk_class"].value_counts())
