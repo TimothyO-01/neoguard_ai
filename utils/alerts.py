@@ -21,11 +21,7 @@ def generate_alerts(df):
     high_pct = (high_risk_count / total_cases) * 100 if total_cases else 0
     mod_pct = (moderate_risk_count / total_cases) * 100 if total_cases else 0
 
-    import streamlit as st
 
-st.write(f"Total cases: {total_cases}")
-st.write(f"High Risk: {high_risk_count} ({high_pct:.1f}%)")
-st.write(f"Moderate Risk: {moderate_risk_count} ({mod_pct:.1f}%)")
     lines = [
         f"Total cases: {total_cases}",
         f"High Risk: {high_risk_count} ({high_pct:.1f}%)",
