@@ -268,6 +268,9 @@ elif input_mode == "Batch Analysis (CSV)":
               from utils.cleaning import clean_csv
               raw_df = clean_csv(raw_df)
               
+              raw_df = enforce_schema(raw_df)
+              
+              df_processed = preprocess_input(raw_df)
         except Exception as e:
             st.error(f"Error reading CSV file: {e}")
             st.stop()
