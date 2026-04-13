@@ -29,11 +29,11 @@ def generate_alerts(df):
     ]
 
     if high_pct > 20:
-        lines.append("🔴 ALERT: Too many high-risk neonates. Immediate intervention needed.")
+        lines.append("🔴 ALERT: Too many high-risk neonates. Immediate intervention needed." n- )
     elif mod_pct > 30:
-        lines.append("🟡 WARNING: Moderate risk cases rising. Monitor closely.")
+        lines.append("🟡 WARNING: Moderate risk cases rising. Monitor closely." n- )
     else:
-        lines.append("🟢 Risk levels acceptable.")
+        lines.append("🟢 Risk levels acceptable." n- )
         
     return "\n".join(lines)
 
