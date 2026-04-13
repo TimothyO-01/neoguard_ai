@@ -51,7 +51,24 @@ COLUMN_ALIASES = {
     "m19": "BirthWeight",
 }
 
+EXPECTED_COLUMNS = [
+    "Age","Education","Residence","Wealth","Sex",
+    "BirthOrder","BirthInterval","DeliveryPlace",
+    "ANC","Tetanus","MultipleBirth","BirthWeight"
+]
 
+def enforce_schema(df):
+    df = df.copy()
+
+    # ensure all required columns exist
+    for col in EXPECTED_COLUMNS:
+        if col not in df.columns:
+            df[col] = 0  # or np.nan
+
+    # drop extra columns (VERY IMPORTANT)
+    df = df[EXPECTED_COLUMNS]
+
+    return df
 # -----------------------------
 # MAIN CLEANING FUNCTION
 # -----------------------------
