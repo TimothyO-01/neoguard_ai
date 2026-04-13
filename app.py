@@ -265,7 +265,9 @@ elif input_mode == "Batch Analysis (CSV)":
 
     if uploaded_file:
         try:
-            raw_df = pd.read_csv(uploaded_file)
+              from utils.cleaning import clean_csv
+              raw_df = clean_csv(raw_df)
+              
         except Exception as e:
             st.error(f"Error reading CSV file: {e}")
             st.stop()
@@ -279,8 +281,7 @@ elif input_mode == "Batch Analysis (CSV)":
             "ANC","Tetanus","MultipleBirth","BirthWeight"
         ]
 
-        # Clean column names (remove spaces)
-        raw_df.columns = raw_df.columns.str.strip()
+        
 
         missing = [col for col in required_columns if col not in raw_df.columns]
 
