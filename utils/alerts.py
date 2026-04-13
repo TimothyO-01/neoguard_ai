@@ -17,7 +17,7 @@ def generate_alerts(df):
     mod_pct = (moderate_risk_count / total_cases) * 100 if total_cases else 0
 
     report = []
-    report.append("🚨 ALERT SUMMARY")
+    report.append("ALERT SUMMARY")
     report.append("----------------------------")
     report.append(f"Total cases        : {total_cases}")
     report.append(f"High Risk cases    : {high_risk_count} ({high_pct:.1f}%)")
