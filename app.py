@@ -256,48 +256,123 @@ if input_mode == "Manual Entry":
                 "neoguard_report.pdf",      
                 "application/pdf"      
             )      
-      
-# ============================      
-# CSV MODE      
-# ============================      
-elif input_mode == "Batch Analysis (CSV)":      
-    uploaded_file = st.file_uploader("Upload CSV", type=["csv"])      
-      
-    if uploaded_file:      
-        raw_df = pd.read_csv(uploaded_file)      
-        df_processed = preprocess_input(raw_df.copy())      
-      
-        for col in features:      
-            if col not in df_processed.columns:      
-                df_processed[col] = 0      
-      
-        df_model = df_processed[features]      
-      
-        raw_df["risk_score"] = model.predict_proba(df_model)[:, 1]      
+
+# ============================
+# CSV MODE (ROBUST VERSION)
+# ============================
+elif input_mode == "Batch Analysis (CSV)":
+    uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
+
+    if uploaded_file:
+        try:
+            raw_df = pd.read_csv(uploaded_file)
+        except Exception as e:
+            st.error(f"Error reading CSV file: {e}")
+            st.stop()
+
+        # -----------------------
+        # VALIDATE REQUIRED COLUMNS
+        # -----------------------
+        required_columns = [
+            "Age","Education","Residence","Wealth","Sex",
+            "BirthOrder","BirthInterval","DeliveryPlace",
+            "ANC","Tetanus","MultipleBirth","BirthWeight"
+        ]
+
+        # Clean column names (remove spaces)
+        raw_df.columns = raw_df.columns.str.strip()
+
+        missing = [col for col in required_columns if col not in raw_df.columns]
+
+        if missing:
+            st.error(f"Missing required columns: {missing}")
+            st.stop()
+
+        # -----------------------
+        # FIX DATA TYPES
+        # -----------------------
+        numeric_cols = ["Age", "BirthOrder", "BirthInterval", "ANC", "BirthWeight"]
+
+        for col in numeric_cols:
+            raw_df[col] = pd.to_numeric(raw_df[col], errors="coerce")
+
+        # -----------------------
+        # PREPROCESS SAFELY
+        # -----------------------
+        try:
+            df_processed = preprocess_input(raw_df.copy())
+        except Exception as e:
+            st.error(f"Preprocessing error: {e}")
+            st.stop()
+
+        # -----------------------
+        # ENSURE FEATURE ALIGNMENT
+        # -----------------------
+        df_model = df_processed.reindex(columns=features, fill_value=0)
+
+        # Handle missing values
+        df_model = df_model.fillna(0)
+
+        # -----------------------
+        # MODEL PREDICTION
+        # -----------------------
+        try:
+            raw_df["risk_score"] = model.predict_proba(df_model)[:, 1]
+        except Exception as e:
+            st.error(f"Prediction error: {e}")
+            st.stop()
+
         raw_df["risk_class"] = raw_df["risk_score"].apply(
-            lambda x: "High Risk" if x >= 0.7 else ("Moderate Risk" if x >= 0.4 else "Low Risk")
-        )      
-      
-        st.subheader("Patient Results")      
-        st.dataframe(raw_df)      
-      
-        st.subheader("High Risk Cases")      
-        st.dataframe(raw_df[raw_df["risk_class"] == "High Risk"])      
-      
-        pdf = generate_population_pdf(raw_df, page)      
-      
-        st.download_button(      
-            "Download Population Health Report (PDF)",      
-            pdf,      
-            "neoguard_population_report.pdf",      
-            "application/pdf"      
-        )      
-      
-        if page == "Population Dashboard":      
-            st.bar_chart(raw_df["risk_class"].value_counts())      
-      
-        elif page == "Early Warning Alerts":      
-            st.warning(generate_alerts(raw_df))      
-      
-    else:      
+            lambda x: "High Risk" if x >= 0.7 else (
+                "Moderate Risk" if x >= 0.4 else "Low Risk"
+            )
+        )
+
+        # -----------------------
+        # DISPLAY RESULTS
+        # -----------------------
+        st.subheader("Patient Results")
+
+        if len(raw_df) > 1000:
+            st.warning(f"Large dataset detected ({len(raw_df)} rows). Showing first 100 rows only.")
+            st.dataframe(raw_df.head(100))
+        else:
+            st.dataframe(raw_df)
+
+        # -----------------------
+        # HIGH RISK CASES
+        # -----------------------
+        st.subheader("High Risk Cases")
+        high_risk_df = raw_df[raw_df["risk_class"] == "High Risk"]
+
+        if len(high_risk_df) == 0:
+            st.success("No high-risk cases detected 🎉")
+        else:
+            st.dataframe(high_risk_df)
+
+        # -----------------------
+        # PDF GENERATION (SAFE)
+        # -----------------------
+        if len(raw_df) > 2000:
+            st.warning("PDF will include summary only due to large dataset.")
+
+        pdf = generate_population_pdf(raw_df, page)
+
+        st.download_button(
+            "Download Population Health Report (PDF)",
+            pdf,
+            "neoguard_population_report.pdf",
+            "application/pdf"
+        )
+
+        # -----------------------
+        # VISUALIZATION
+        # -----------------------
+        if page == "Population Dashboard":
+            st.bar_chart(raw_df["risk_class"].value_counts())
+
+        elif page == "Early Warning Alerts":
+            st.warning(generate_alerts(raw_df))
+
+    else:
         st.info("Upload a CSV file to continue.")
