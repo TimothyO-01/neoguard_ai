@@ -263,17 +263,21 @@ if input_mode == "Manual Entry":
 elif input_mode == "Batch Analysis (CSV)":
     uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
 
-    if uploaded_file:
-        try:
-              from utils.cleaning import clean_csv
-              raw_df = clean_csv(raw_df)
-              
-              raw_df = enforce_schema(raw_df)
-              
-              df_processed = preprocess_input(raw_df)
-        except Exception as e:
-            st.error(f"Error reading CSV file: {e}")
-            st.stop()
+if uploaded_file is not None:
+
+    try:
+        raw_df = pd.read_csv(uploaded_file)
+
+        from utils.cleaning import clean_csv, enforce_schema
+
+        raw_df = clean_csv(raw_df)
+        raw_df = enforce_schema(raw_df)
+
+        df_processed = preprocess_input(raw_df.copy())
+
+    except Exception as e:
+        st.error(f"CSV Processing Error: {e}")
+        st.stop()
 
         # -----------------------
         # VALIDATE REQUIRED COLUMNS
@@ -350,7 +354,7 @@ elif input_mode == "Batch Analysis (CSV)":
         high_risk_df = raw_df[raw_df["risk_class"] == "High Risk"]
 
         if len(high_risk_df) == 0:
-            st.success("No high-risk cases detected 🎉")
+            st.success("No high-risk cases detected ")
         else:
             st.dataframe(high_risk_df)
 
