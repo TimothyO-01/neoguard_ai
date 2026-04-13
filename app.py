@@ -153,6 +153,157 @@ def generate_population_pdf(df, page):
     buffer.seek(0)
     return buffer
 
+# ============================
+# MANUAL MODE (GROUPED UI)
+# ============================
+if input_mode == "Manual Entry":
+
+    if page != "Clinical Risk Assessment":
+        st.warning("Manual entry only works in Clinical Risk Assessment")
+
+    else:
+        st.subheader("Clinical Risk Assessment")
+
+        # ============================
+        # SECTION 1: MOTHER PROFILE
+        # ============================
+        st.markdown("### Mother’s Profile")
+        st.caption("Basic background information about the mother")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            age = st.text_input("Age", placeholder="e.g. 25")
+            edu = st.selectbox(
+                "Education",
+                ["No education","Primary","Secondary","Higher"],
+                help="Highest level of education"
+            )
+            res = st.selectbox(
+                "Residence",
+                ["Urban","Rural"],
+                help="Place of residence"
+            )
+
+        with col2:
+            wealth = st.selectbox(
+                "Wealth",
+                ["Poorest","Poorer","Middle","Richer","Richest"],
+                help="Socioeconomic level"
+            )
+            sex = st.selectbox("Sex", ["Male","Female"])
+            order = st.text_input("Birth Order", placeholder="e.g. 1")
+
+        st.divider()
+
+        # ============================
+        # SECTION 2: PREGNANCY HISTORY
+        # ============================
+        st.markdown("### Pregnancy History")
+        st.caption("Details about antenatal care and pregnancy conditions")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            interval = st.text_input(
+                "Birth Interval (months)",
+                placeholder="e.g. 12"
+            )
+            place = st.selectbox(
+                "Delivery Place",
+                ["Home","PHC","Hospital"],
+                help="Where delivery occurred"
+            )
+            anc = st.text_input(
+                "Antenatal Visits",
+                placeholder="e.g. 4"
+            )
+
+        with col2:
+            tetanus = st.selectbox(
+                "Tetanus",
+                ["Yes","No"],
+                help="Tetanus immunization status"
+            )
+            multi = st.selectbox(
+                "Multiple Birth",
+                ["No","Yes"],
+                help="Twins or more"
+            )
+
+        st.divider()
+
+        # ============================
+        # SECTION 3: NEWBORN DETAILS
+        # ============================
+        st.markdown("### Newborn Details")
+        st.caption("Information about the baby at birth")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            weight = st.text_input(
+                "Birth Weight (grams)",
+                placeholder="e.g. 2500"
+            )
+
+        with col2:
+            st.markdown(" ")  # spacing
+
+        st.divider()
+
+        # ============================
+        # PREDICTION BUTTON
+        # ============================
+        if st.button("Predict Risk"):
+
+            user_input = pd.DataFrame([{
+                "Age": age,
+                "Education": edu,
+                "Residence": res,
+                "Wealth": wealth,
+                "Sex": sex,
+                "BirthOrder": order,
+                "BirthInterval": interval,
+                "DeliveryPlace": place,
+                "ANC": anc,
+                "Tetanus": tetanus,
+                "MultipleBirth": multi,
+                "BirthWeight": weight
+            }])
+
+            df = preprocess_input(user_input)
+            df = df.reindex(columns=features, fill_value=0)
+
+            prob = model.predict_proba(df)[0][1]
+
+            if prob >= 0.7:
+                result = "HIGH RISK"
+                st.error(f"{result} ({prob*100:.1f}%)")
+            elif prob >= 0.4:
+                result = "MODERATE RISK"
+                st.warning(f"{result} ({prob*100:.1f}%)")
+            else:
+                result = "LOW RISK"
+                st.success(f"{result} ({prob*100:.1f}%)")
+
+            st.progress(prob)
+
+            advice = clinical_advice(prob)
+            st.info(advice)
+
+            factors = explain_risk(user_input.iloc[0].to_dict())
+
+            pdf = generate_pdf(result, prob, advice, factors)
+
+            st.download_button(
+                "Download Report",
+                pdf,
+                "neoguard_report.pdf",
+                "application/pdf"
+            )
+
+
 
 # ============================
 # MANUAL MODE
