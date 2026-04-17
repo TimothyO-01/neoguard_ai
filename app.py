@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import joblib
 import sqlite3
-from datetime import datetime, timezone
 from io import BytesIO
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
@@ -298,18 +297,13 @@ if input_mode == "Manual Entry":
             # LOGGING (NEW ONLY)
             user_input["risk_score"] = prob
             user_input["risk_class"] = result
-            user_input["timestamp"] = datetime.now(timezone.utc).isoformat()
 
             log_to_db(user_input)
 
             audit_log(pd.DataFrame([{
                 "PatientID": patient_id,
                 "risk_score": prob,
-                "risk_class": result,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "mode": "Manual",
-                "file": f"NeoGuard_Report_{patient_id}.pdf"
-            }]))
+                "risk_class": result}]))
 
             pdf = generate_pdf(patient_id, result, prob, advice, factors)
 
@@ -367,8 +361,6 @@ elif input_mode == "Batch Analysis (CSV)":
                 "Moderate Risk" if x >= 0.4 else "Low Risk"
             )
         )
-
-        raw_df["timestamp"] = datetime.now(timezone.utc).isoformat()
 
         log_to_db(raw_df)
 
